@@ -33,7 +33,7 @@ int main() {
         printf("8. Devolver Livro\n");
         printf("9. Listar Livros Emprestados\n");
         printf("10. Carregar Arquivo de Dados\n");
-        printf("11. Remover Livro \n");
+        printf("----------------------------\n");
        
         printf("0. Sair\n");
         printf("----------------------------\n");
@@ -125,14 +125,6 @@ int main() {
                 break;
             }
 
-            case 11:
-                printf("Digite o código do livro a ser removido: ");
-                scanf("%d", &codigo);
-                removerLivro(nome_arquivo, codigo);
-                break;
-
-            
-            
             case 0:
                 printf("Saindo do programa...\n");
                 break;

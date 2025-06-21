@@ -109,21 +109,21 @@ void processarLinhaEmprestimo(const char *nome_arquivo_livros, char *linha) {
     printf("Registro de empréstimo do arquivo de carga processado para usuário %d e livro %d.\n", emp.codigo_usuario, emp.codigo_livro);
 }
 
-\
+
 void carregarDadosCompletos(const char *nome_arquivo_livros, const char *nome_arquivo_usuarios, const char *arquivo_txt) {
     FILE *arquivo_texto = fopen(arquivo_txt, "r");
     if (!arquivo_texto) {
         perror("Erro ao abrir o arquivo de texto para carregamento completo");
-        // Não usamos exit() para não fechar o programa, apenas retornamos ao menu.
+        
         return;
     }
 
     char linha[512];
     
-    // Loop para ler cada linha do arquivo de texto
+    
     while (fgets(linha, sizeof(linha), arquivo_texto)) {
-        // Cria uma cópia local da linha para manipulação
-        // Isso garante que a linha original não seja modificada, evitando problemas de concorrência
+        
+        
         char linha_local[512];
         strcpy(linha_local, linha);
 
