@@ -151,7 +151,6 @@ void carregarDadosCompletos(const char *nome_arquivo_livros, const char *nome_ar
                 token = strtok(NULL, delimitador); if (token) { removerEspacos(token); strncpy(livro.editora, token, MAX_EDITORA - 1); }
                 token = strtok(NULL, delimitador); if (token) { removerEspacos(token); livro.edicao = atoi(token); }
                 token = strtok(NULL, delimitador); if (token) { removerEspacos(token); livro.ano_publicacao = atoi(token); }
-                token = strtok(NULL, delimitador); if (token) { removerEspacos(token); substituirVirgulaPorPonto(token); livro.preco = atof(token); }
                 token = strtok(NULL, delimitador); if (token) { removerEspacos(token); livro.quantidade_estoque = atoi(token); }
                 
                 livro.prox_registro = -1;
