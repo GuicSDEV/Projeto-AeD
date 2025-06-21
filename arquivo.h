@@ -20,12 +20,6 @@ typedef struct Cabecalho {
 // Retorno: nenhum
 void inicializarArquivo(const char *nome_arquivo);
 
-// Carrega dados de um arquivo texto e cadastra no sistema
-// pre-condicao: arquivo de texto deve estar no formato correto
-// pos-condicao: dados do arquivo texto carregados e cadastrados no sistema
-// Entrada: nome do arquivo bin�rio e nome do arquivo texto
-// Retorno: nenhum
-void carregarArquivoDados(const char *nome_arquivo, const char *arquivo_txt);
 
 // Imprime a lista de registros livres
 // pre-condicao: arquivo deve estar aberto para leitura

@@ -10,15 +10,15 @@
 
 // Estrutura do Registro de Livro
 typedef struct Livro {
-    int codigo;                        // C�digo do livro, �nico para cada livro
-    char titulo[MAX_TITULO];           // T�tulo do livro
-    char autor[MAX_AUTOR];             // Autor do livro
-    char editora[MAX_EDITORA];         // Editora do livro
-    int edicao;                        // Edi��o do livro
-    int ano_publicacao;                // Ano de publica��o do livro
-    float preco;                       // Pre�o do livro
-    int quantidade_estoque;            // Quantidade em estoque
-    int prox_registro;                 // Ponteiro para o pr�ximo registro na lista encadeada
+    int codigo;
+    char titulo[MAX_TITULO];
+    char autor[MAX_AUTOR];
+    char editora[MAX_EDITORA];
+    int edicao;
+    int ano_publicacao;
+    float preco;
+    int quantidade_estoque;
+    int prox_registro;
 } Livro;
 
 // Fun��es relacionadas aos livros

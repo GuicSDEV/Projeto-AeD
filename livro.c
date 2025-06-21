@@ -1,3 +1,5 @@
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -6,23 +8,16 @@
 #include "arquivo.h"
 #include "util.h"
 
-// Implementa��o das fun��es relacionadas aos livros
-
-// Cadastra um livro no arquivo bin�rio
-// Insere um novo livro na lista encadeada do arquivo bin�rio, reutilizando posi��es livres se houver
-// pre-condicao: arquivo deve estar aberto para leitura e escrita
-// pos-condicao: livro cadastrado no arquivo bin�rio
-// Entrada: nome do arquivo bin�rio e estrutura Livro contendo as informa��es do livro
-// Retorno: nenhum
+// Cadastra um livro no arquivo binário
 void cadastrarLivro(const char *nome_arquivo, Livro livro) {
     if (buscarLivroPorCodigo(nome_arquivo, livro.codigo)) {
-        printf("Erro: Livro com o c�digo %d j� existe.\n", livro.codigo);
+        printf("Erro: Livro com o código %d já existe.\n", livro.codigo);
         return;
     }
 
     FILE *arquivo = fopen(nome_arquivo, "rb+");
     if (!arquivo) {
-        perror("Erro ao abrir o arquivo bin�rio");
+        perror("Erro ao abrir o arquivo binário");
         exit(EXIT_FAILURE);
     }
 
@@ -63,7 +58,7 @@ void cadastrarLivro(const char *nome_arquivo, Livro livro) {
     }
 }
 
-livro.prox_registro = -1;  // Novo livro n�o aponta para nenhum outro (�ltimo da lista)
+livro.prox_registro = -1;
 
     fseek(arquivo, nova_posicao, SEEK_SET);
     fwrite(&livro, sizeof(Livro), 1, arquivo);
@@ -73,16 +68,12 @@ livro.prox_registro = -1;  // Novo livro n�o aponta para nenhum outro (�ltim
 
     fclose(arquivo);
 }
-// Remove um livro do arquivo bin�rio
-// Marca o livro como removido, adicionando sua posi��o � lista de registros livres
-// pre-condicao: arquivo deve estar aberto para leitura e escrita
-// pos-condicao: livro removido do arquivo bin�rio e posi��o adicionada � lista de registros livres
-// Entrada: nome do arquivo bin�rio e c�digo do livro a ser removido
-// Retorno: nenhum
+
+// Remove um livro do arquivo binário
 void removerLivro(const char *nome_arquivo, int codigo) {
     FILE *arquivo = fopen(nome_arquivo, "rb+");
     if (!arquivo) {
-        perror("Erro ao abrir o arquivo bin�rio");
+        perror("Erro ao abrir o arquivo binário");
         exit(EXIT_FAILURE);
     }
 
@@ -122,20 +113,15 @@ void removerLivro(const char *nome_arquivo, int codigo) {
         posicao_atual = livro.prox_registro;
     }
 
-    printf("Livro com c�digo %d n�o encontrado.\n", codigo);
+    printf("Livro com código %d não encontrado.\n", codigo);
     fclose(arquivo);
 }
 
-// Imprime os dados de um livro espec�fico
-// Encontra e imprime todos os dados de um livro com base no c�digo fornecido
-// pre-condicao: arquivo deve estar aberto para leitura
-// pos-condicao: dados do livro impressos na tela
-// Entrada: nome do arquivo bin�rio e c�digo do livro a ser impresso
-// Retorno: nenhum
+// Imprime os dados de um livro específico
 void imprimirLivro(const char *nome_arquivo, int codigo) {
     FILE *arquivo = fopen(nome_arquivo, "rb");
     if (!arquivo) {
-        perror("Erro ao abrir o arquivo bin�rio");
+        perror("Erro ao abrir o arquivo binário");
         exit(EXIT_FAILURE);
     }
 
@@ -150,13 +136,13 @@ void imprimirLivro(const char *nome_arquivo, int codigo) {
         fread(&livro, sizeof(Livro), 1, arquivo);
 
         if (livro.codigo == codigo) {
-            printf("C�digo: %d\n", livro.codigo);
-            printf("T�tulo: %s\n", livro.titulo);
+            printf("Código: %d\n", livro.codigo);
+            printf("Título: %s\n", livro.titulo);
             printf("Autor: %s\n", livro.autor);
             printf("Editora: %s\n", livro.editora);
-            printf("Edi��o: %d\n", livro.edicao);
-            printf("Ano de Publica��o: %d\n", livro.ano_publicacao);
-            printf("Pre�o: %.2f\n", livro.preco);
+            printf("Edição: %d\n", livro.edicao);
+            printf("Ano de Publicação: %d\n", livro.ano_publicacao);
+            printf("Preço: %.2f\n", livro.preco);
             printf("Quantidade em Estoque: %d\n", livro.quantidade_estoque);
             fclose(arquivo);
             return;
@@ -165,58 +151,15 @@ void imprimirLivro(const char *nome_arquivo, int codigo) {
         posicao_atual = livro.prox_registro;
     }
 
-    printf("Livro com c�digo %d n�o encontrado.\n", codigo);
+    printf("Livro com código %d não encontrado.\n", codigo);
     fclose(arquivo);
 }
-
-// Lista todos os livros cadastrados no sistema
-// Percorre a lista encadeada de livros no arquivo e imprime os dados principais de cada um
-// pre-condicao: arquivo deve estar aberto para leitura
-// pos-condicao: lista de livros impressa na tela
-// Entrada: nome do arquivo bin�rio
-// Retorno: nenhum
-void listarTodosLivros(const char *nome_arquivo) {
-    FILE *arquivo = fopen(nome_arquivo, "rb");
-    if (!arquivo) {
-        perror("Erro ao abrir o arquivo bin�rio");
-        exit(EXIT_FAILURE);
-    }
-
-    Cabecalho cabecalho;
-    fread(&cabecalho, sizeof(Cabecalho), 1, arquivo);
-
-    int posicao_atual = cabecalho.posicao_inicio_lista;
-    Livro livro;
-
-    while (posicao_atual != -1) {
-        fseek(arquivo, posicao_atual, SEEK_SET);
-        fread(&livro, sizeof(Livro), 1, arquivo);
-
-        printf("C�digo: %d\n", livro.codigo);
-        printf("T�tulo: %s\n", livro.titulo);
-        printf("Autor: %s\n", livro.autor);
-        printf("Quantidade em Estoque: %d\n", livro.quantidade_estoque);
-        printf("prox_registro: %d\n\n", livro.prox_registro);  // Debug: Imprime o prox_registro
-
-        posicao_atual = livro.prox_registro;
-    }
-
-    fclose(arquivo);
-}
-
-
-
 
 // Busca livros por autor
-// Percorre a lista de livros no arquivo e imprime os t�tulos de todos os livros de um autor espec�fico
-// pre-condicao: arquivo deve estar aberto para leitura
-// pos-condicao: t�tulos dos livros do autor impressos na tela
-// Entrada: nome do arquivo bin�rio e nome do autor a ser buscado
-// Retorno: nenhum
 void buscarPorAutor(const char *nome_arquivo, const char *autor) {
     FILE *arquivo = fopen(nome_arquivo, "rb");
     if (!arquivo) {
-        perror("Erro ao abrir o arquivo bin�rio");
+        perror("Erro ao abrir o arquivo binário");
         exit(EXIT_FAILURE);
     }
 
@@ -232,7 +175,7 @@ void buscarPorAutor(const char *nome_arquivo, const char *autor) {
         fread(&livro, sizeof(Livro), 1, arquivo);
 
         if (strcmp(livro.autor, autor) == 0) {
-            printf("T�tulo: %s\n", livro.titulo);
+            printf("Título: %s\n", livro.titulo);
             encontrado = 1;
         }
 
@@ -246,16 +189,11 @@ void buscarPorAutor(const char *nome_arquivo, const char *autor) {
     fclose(arquivo);
 }
 
-// Busca livros por t�tulo
-// Encontra e imprime os dados completos de um livro com base no t�tulo fornecido
-// pre-condicao: arquivo deve estar aberto para leitura
-// pos-condicao: dados do livro com o t�tulo fornecido impressos na tela
-// Entrada: nome do arquivo bin�rio e t�tulo do livro a ser buscado
-// Retorno: nenhum
+// Busca livros por título
 void buscarPorTitulo(const char *nome_arquivo, const char *titulo) {
     FILE *arquivo = fopen(nome_arquivo, "rb");
     if (!arquivo) {
-        perror("Erro ao abrir o arquivo bin�rio");
+        perror("Erro ao abrir o arquivo binário");
         exit(EXIT_FAILURE);
     }
 
@@ -270,13 +208,13 @@ void buscarPorTitulo(const char *nome_arquivo, const char *titulo) {
         fread(&livro, sizeof(Livro), 1, arquivo);
 
         if (strcmp(livro.titulo, titulo) == 0) {
-            printf("C�digo: %d\n", livro.codigo);
-            printf("T�tulo: %s\n", livro.titulo);
+            printf("Código: %d\n", livro.codigo);
+            printf("Título: %s\n", livro.titulo);
             printf("Autor: %s\n", livro.autor);
             printf("Editora: %s\n", livro.editora);
-            printf("Edi��o: %d\n", livro.edicao);
-            printf("Ano de Publica��o: %d\n", livro.ano_publicacao);
-            printf("Pre�o: %.2f\n", livro.preco);
+            printf("Edição: %d\n", livro.edicao);
+            printf("Ano de Publicação: %d\n", livro.ano_publicacao);
+            printf("Preço: %.2f\n", livro.preco);
             printf("Quantidade em Estoque: %d\n", livro.quantidade_estoque);
             fclose(arquivo);
             return;
@@ -285,19 +223,15 @@ void buscarPorTitulo(const char *nome_arquivo, const char *titulo) {
         posicao_atual = livro.prox_registro;
     }
 
-    printf("Livro com t�tulo '%s' n�o encontrado.\n", titulo);
+    printf("Livro com título '%s' não encontrado.\n", titulo);
     fclose(arquivo);
 }
-// Obt�m o t�tulo de um livro pelo c�digo
-// Busca um livro pelo c�digo e retorna seu t�tulo
-// pre-condicao: arquivo deve estar aberto para leitura
-// pos-condicao: t�tulo do livro retornado ou NULL se n��o encontrado
-// Entrada: nome do arquivo bin�rio e c�digo do livro
-// Retorno: ponteiro para o t�tulo do livro, ou NULL se n��o encontrado
+
+// Obtém o título de um livro pelo código
 char* getTituloLivroPorCodigo(const char *nome_arquivo, int codigo) {
     FILE *arquivo = fopen(nome_arquivo, "rb");
     if (!arquivo) {
-        return NULL; // Or handle error appropriately
+        return NULL;
     }
 
     Cabecalho cabecalho;
@@ -321,4 +255,43 @@ char* getTituloLivroPorCodigo(const char *nome_arquivo, int codigo) {
 
     fclose(arquivo);
     return NULL;
+}
+
+// Lista todos os livros cadastrados no sistema (VERSÃO CORRETA E ÚNICA)
+void listarTodosLivros(const char *nome_arquivo) {
+    FILE *arquivo = fopen(nome_arquivo, "rb");
+    if (!arquivo) {
+        perror("Erro ao abrir o arquivo binário");
+        return;
+    }
+
+    Cabecalho cabecalho;
+    fread(&cabecalho, sizeof(Cabecalho), 1, arquivo);
+
+    int posicao_atual = cabecalho.posicao_inicio_lista;
+    Livro livro;
+    int encontrou_livros = 0;
+
+    printf("\n--- Lista de Todos os Livros ---\n");
+    while (posicao_atual != -1) {
+        fseek(arquivo, posicao_atual, SEEK_SET);
+        fread(&livro, sizeof(Livro), 1, arquivo);
+        
+        // Imprime apenas os campos especificados no PDF
+        printf("Código: %d | Título: %s | Autor: %s | Exemplares: %d\n",
+               livro.codigo,
+               livro.titulo,
+               livro.autor,
+               livro.quantidade_estoque);
+
+        posicao_atual = livro.prox_registro;
+        encontrou_livros = 1;
+    }
+
+    if (!encontrou_livros) {
+        printf("Nenhum livro cadastrado.\n");
+    }
+    printf("--------------------------------\n");
+
+    fclose(arquivo);
 }
