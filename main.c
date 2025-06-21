@@ -21,7 +21,7 @@ int main() {
 
     int opcao;
     do {
-        // O menu foi reordenado para corresponder à ordem do PDF
+        
         printf("\n----- Menu da Biblioteca -----\n");
         printf("1. Cadastrar Livro\n");
         printf("2. Imprimir Dados do Livro\n");
@@ -33,9 +33,8 @@ int main() {
         printf("8. Devolver Livro\n");
         printf("9. Listar Livros Emprestados\n");
         printf("10. Carregar Arquivo de Dados\n");
-        printf("----------------------------\n");
-        printf("11. Remover Livro (Extra)\n");
-        printf("12. Imprimir Lista de Livres (Extra)\n");
+        printf("11. Remover Livro \n");
+        printf("12. Imprimir Lista de Livros\n");
         printf("0. Sair\n");
         printf("----------------------------\n");
         printf("Escolha uma opção: ");
@@ -61,8 +60,6 @@ int main() {
                 scanf("%d", &livro.edicao);
                 printf("Ano de Publicação: ");
                 scanf("%d", &livro.ano_publicacao);
-                printf("Preço: ");
-                scanf("%f", &livro.preco);
                 printf("Quantidade em Estoque: ");
                 scanf("%d", &livro.quantidade_estoque);
                 cadastrarLivro(nome_arquivo, livro);
@@ -111,12 +108,12 @@ int main() {
                 printf("Digite o código do livro a ser devolvido: ");
                 scanf("%d", &codigo_livro_devolucao);
                 printf("Digite o código do usuário: ");
-                scanf("%d", &codigo_usuario_devolucao); // CORRIGIDO: usa %d para ler um inteiro
+                scanf("%d", &codigo_usuario_devolucao); 
                 devolverLivro(nome_arquivo, codigo_livro_devolucao, codigo_usuario_devolucao);
                 break;
             }
             case 9:
-                // CORRIGIDO: passa os dois nomes de arquivo necessários para a função
+                printf("Listando empréstimos pendentes...\n");
                 listarEmprestimosPendentes(nome_arquivo, nome_arquivo_usuarios);
                 break;
 

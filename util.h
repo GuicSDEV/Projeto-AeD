@@ -4,8 +4,8 @@
 typedef struct Emprestimo {
     int codigo_livro;
     int codigo_usuario;
-    char data_emprestimo[11]; 
-    char data_devolucao[11];  
+    char data_emprestimo[37]; 
+    char data_devolucao[37];  
     int devolvido; 
 } Emprestimo;
 
