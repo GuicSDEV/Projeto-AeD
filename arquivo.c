@@ -141,34 +141,3 @@ void imprimirListaLivres(const char *nome_arquivo) {
 
     fclose(arquivo);
 }
-
-
-
-// Fun��o para substituir v�rgulas por pontos em strings de n�meros
-void substituirVirgulaPorPonto(char *str) {
-    for (int i = 0; str[i] != '\0'; i++) {
-        if (str[i] == ',') {
-            str[i] = '.';
-        }
-    }
-}
-
-// Fun��o para remover espa�os em branco no in�cio e fim de uma string
-void removerEspacos(char *str) {
-    // Remove espa�os � direita
-    int len = strlen(str);
-    while (len > 0 && isspace((unsigned char)str[len - 1])) {
-        len--;
-    }
-    str[len] = '\0';
-
-    // Remove espa�os � esquerda
-    int start = 0;
-    while (str[start] != '\0' && isspace((unsigned char)str[start])) {
-        start++;
-    }
-
-    if (start > 0) {
-        memmove(str, str + start, len - start + 1);
-    }
-}

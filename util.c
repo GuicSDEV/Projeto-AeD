@@ -4,6 +4,10 @@
 #include "arquivo.h"
 #include <time.h>
 #include <string.h>
+#include "livro.h"
+#include "usuario.h"
+#include "carregamento.h"
+#include <ctype.h>
 
 // Implementa��o das fun��es auxiliares
 

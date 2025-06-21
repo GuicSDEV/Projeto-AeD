@@ -126,7 +126,7 @@ void processarLinhaEmprestimo(const char *nome_arquivo_livros, char *linha) {
         // Registro de devolução
         // Aqui, vamos chamar a função devolverLivro, que deve atualizar o estoque do livro
         // e marcar o empréstimo como devolvido.
-        devolverLivro(nome_arquivo_livros, codigo_livro, getNomeUsuarioPorCodigo("usuarios.bin", codigo_usuario));
+        devolverLivro(nome_arquivo_livros, codigo_livro, buscarUsuarioPorCodigo("usuarios.bin", codigo_usuario));
         // assumindo que devolverLivro atualiza o estoque e marca o empréstimo como devolvido
         // Se devolverLivro foi bem-sucedido, não precisamos fazer mais nada aqui.
         printf("Devolução registrada com sucesso para o usuário %d do livro %d.\n", codigo_usuario, codigo_livro);
