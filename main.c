@@ -34,7 +34,7 @@ int main() {
         printf("9. Listar Livros Emprestados\n");
         printf("10. Carregar Arquivo de Dados\n");
         printf("11. Remover Livro \n");
-        printf("12. Imprimir Lista de Livros\n");
+       
         printf("0. Sair\n");
         printf("----------------------------\n");
         printf("Escolha uma opção: ");
@@ -99,7 +99,7 @@ int main() {
                 printf("Digite o código do livro a ser emprestado: ");
                 scanf("%d", &codigo_livro_emprestimo);
                 printf("Digite o código do usuário: ");
-                scanf("%d", &codigo_usuario_emprestimo); // CORRIGIDO: usa %d para ler um inteiro
+                scanf("%d", &codigo_usuario_emprestimo);  
                 emprestarLivro(nome_arquivo, codigo_livro_emprestimo, codigo_usuario_emprestimo);
                 break;
             }
@@ -125,16 +125,13 @@ int main() {
                 break;
             }
 
-            // Funções extras que não estavam no PDF principal
             case 11:
                 printf("Digite o código do livro a ser removido: ");
                 scanf("%d", &codigo);
                 removerLivro(nome_arquivo, codigo);
                 break;
 
-            case 12:
-                imprimirListaLivres(nome_arquivo);
-                break;
+            
             
             case 0:
                 printf("Saindo do programa...\n");

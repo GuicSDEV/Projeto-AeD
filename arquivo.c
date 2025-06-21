@@ -32,32 +32,3 @@ void inicializarArquivo(const char *nome_arquivo) {
 }
 
 
-// Imprime a lista de registros livres
-// Exibe as posi��es dos registros que foram removidos e est�o dispon�veis para reutiliza��o
-// pre-condicao: arquivo deve estar aberto para leitura
-// pos-condicao: posi��es livres impressas na tela
-// Entrada: nome do arquivo bin�rio
-// Retorno: nenhum
-void imprimirListaLivres(const char *nome_arquivo) {
-    FILE *arquivo = fopen(nome_arquivo, "rb");
-    if (!arquivo) {
-        perror("Erro ao abrir o arquivo bin�rio");
-        exit(EXIT_FAILURE);
-    }
-
-    Cabecalho cabecalho;
-    fread(&cabecalho, sizeof(Cabecalho), 1, arquivo);
-
-    int posicao_livre = cabecalho.posicao_primeiro_livre;
-    Livro livro;
-
-    printf("Lista de registros livres:\n");
-    while (posicao_livre != -1) {
-        fseek(arquivo, posicao_livre, SEEK_SET);
-        fread(&livro, sizeof(Livro), 1, arquivo);
-        printf("Posi��o Livre: %d\n", posicao_livre);
-        posicao_livre = livro.prox_registro;
-    }
-
-    fclose(arquivo);
-}

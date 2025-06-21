@@ -8,7 +8,7 @@
 #include "usuario.h"
 #include "carregamento.h"
 
-// Função interna para atualizar o estoque de um livro
+// Função interna para atualizar o estoque de um livro (continua igual)
 void atualizarEstoqueLivro(const char *nome_arquivo_livros, int codigo_livro, int delta) {
     FILE *arquivo = fopen(nome_arquivo_livros, "rb+");
     if (!arquivo) {
@@ -36,7 +36,7 @@ void atualizarEstoqueLivro(const char *nome_arquivo_livros, int codigo_livro, in
 }
 
 
-// Função para processar uma linha de texto e cadastrar um usuário
+// Função para processar uma linha de texto e cadastrar um usuário (continua igual)
 void processarLinhaUsuario(const char *nome_arquivo_usuarios, char *linha) {
     Usuario usuario;
     char *token;
@@ -52,12 +52,11 @@ void processarLinhaUsuario(const char *nome_arquivo_usuarios, char *linha) {
     strncpy(usuario.nome_usuario, token, MAX_NOME_USUARIO -1);
     usuario.nome_usuario[MAX_NOME_USUARIO - 1] = '\0';
 
-
     usuario.prox_registro = -1;
     cadastrarUsuario(nome_arquivo_usuarios, usuario);
 }
 
-// Função para processar uma linha de texto e registrar um empréstimo ou devolução do arquivo de carga
+// Função para processar uma linha de texto e registrar um empréstimo (continua igual)
 void processarLinhaEmprestimo(const char *nome_arquivo_livros, char *linha) {
     Emprestimo emp;
     char *token;
@@ -76,7 +75,7 @@ void processarLinhaEmprestimo(const char *nome_arquivo_livros, char *linha) {
     emp.data_emprestimo[10] = '\0';
 
     token = strtok(NULL, ";");
-    if (token && strlen(token) > 1) { // Verifica se a data de devolução existe
+    if (token && strlen(token) > 1) {
         removerEspacos(token);
         strncpy(emp.data_devolucao, token, 10);
         emp.data_devolucao[10] = '\0';
@@ -86,7 +85,6 @@ void processarLinhaEmprestimo(const char *nome_arquivo_livros, char *linha) {
         emp.devolvido = 0;
     }
 
-    // Verifica se livro e usuário existem
     if (!buscarLivroPorCodigo(nome_arquivo_livros, emp.codigo_livro)) {
         printf("Erro de carga: Livro com código %d não encontrado para empréstimo.\n", emp.codigo_livro);
         return;
@@ -96,14 +94,10 @@ void processarLinhaEmprestimo(const char *nome_arquivo_livros, char *linha) {
         return;
     }
     
-    // Atualiza o estoque do livro
-    // Se o livro não foi devolvido, diminui o estoque.
-    // Se foi devolvido (no próprio arquivo de carga), o estoque não muda (saiu e voltou).
     if (emp.devolvido == 0) {
         atualizarEstoqueLivro(nome_arquivo_livros, emp.codigo_livro, -1);
     }
 
-    // Registra o empréstimo no arquivo binário de empréstimos
     FILE *arquivo_emprestimos = fopen("emprestimos.bin", "ab");
     if (!arquivo_emprestimos) {
         perror("Erro ao abrir arquivo de empréstimos para carga");
@@ -115,58 +109,67 @@ void processarLinhaEmprestimo(const char *nome_arquivo_livros, char *linha) {
     printf("Registro de empréstimo do arquivo de carga processado para usuário %d e livro %d.\n", emp.codigo_usuario, emp.codigo_livro);
 }
 
-
+\
 void carregarDadosCompletos(const char *nome_arquivo_livros, const char *nome_arquivo_usuarios, const char *arquivo_txt) {
     FILE *arquivo_texto = fopen(arquivo_txt, "r");
     if (!arquivo_texto) {
         perror("Erro ao abrir o arquivo de texto para carregamento completo");
-        exit(EXIT_FAILURE);
+        // Não usamos exit() para não fechar o programa, apenas retornamos ao menu.
+        return;
     }
 
     char linha[512];
-    char linha_original[512]; // Buffer para preservar a linha original para strtok
     
+    // Loop para ler cada linha do arquivo de texto
     while (fgets(linha, sizeof(linha), arquivo_texto)) {
-        linha[strcspn(linha, "\n")] = '\0'; 
-        strcpy(linha_original, linha);
+        // Cria uma cópia local da linha para manipulação
+        // Isso garante que a linha original não seja modificada, evitando problemas de concorrência
+        char linha_local[512];
+        strcpy(linha_local, linha);
 
-        char *conteudo_linha = linha_original;
-        char tipo_registro = linha[0]; 
-        
-        if (strlen(linha) > 2) {
-            conteudo_linha = &linha_original[2];
-        } else {
-            continue;
+        // Remove a quebra de linha do final, se houver
+        linha_local[strcspn(linha_local, "\n\r")] = 0;
+
+        if (strlen(linha_local) < 2) {
+            continue; // Pula linhas vazias
         }
+        
+        char tipo_registro = linha_local[0]; 
+        char *delimitador = ";";
+        
+        // Ponteiro para o início dos dados (após "L;" ou "U;")
+        char *conteudo_linha = linha_local + 2;
 
         switch (tipo_registro) {
-            case 'L': { // Livro
+            case 'L': {
                 Livro livro;
                 char *token;
 
-                token = strtok(conteudo_linha, ";"); removerEspacos(token); livro.codigo = atoi(token);
-                token = strtok(NULL, ";"); removerEspacos(token); strncpy(livro.titulo, token, MAX_TITULO - 1);
-                token = strtok(NULL, ";"); removerEspacos(token); strncpy(livro.autor, token, MAX_AUTOR - 1);
-                token = strtok(NULL, ";"); removerEspacos(token); strncpy(livro.editora, token, MAX_EDITORA - 1);
-                token = strtok(NULL, ";"); removerEspacos(token); livro.edicao = atoi(token);
-                token = strtok(NULL, ";"); removerEspacos(token); livro.ano_publicacao = atoi(token);
-                token = strtok(NULL, ";"); removerEspacos(token); substituirVirgulaPorPonto(token); livro.preco = atof(token);
-                token = strtok(NULL, ";"); removerEspacos(token); livro.quantidade_estoque = atoi(token);
-
+                token = strtok(conteudo_linha, delimitador); if (token) { removerEspacos(token); livro.codigo = atoi(token); }
+                token = strtok(NULL, delimitador); if (token) { removerEspacos(token); strncpy(livro.titulo, token, MAX_TITULO - 1); }
+                token = strtok(NULL, delimitador); if (token) { removerEspacos(token); strncpy(livro.autor, token, MAX_AUTOR - 1); }
+                token = strtok(NULL, delimitador); if (token) { removerEspacos(token); strncpy(livro.editora, token, MAX_EDITORA - 1); }
+                token = strtok(NULL, delimitador); if (token) { removerEspacos(token); livro.edicao = atoi(token); }
+                token = strtok(NULL, delimitador); if (token) { removerEspacos(token); livro.ano_publicacao = atoi(token); }
+                token = strtok(NULL, delimitador); if (token) { removerEspacos(token); substituirVirgulaPorPonto(token); livro.preco = atof(token); }
+                token = strtok(NULL, delimitador); if (token) { removerEspacos(token); livro.quantidade_estoque = atoi(token); }
+                
                 livro.prox_registro = -1;
                 cadastrarLivro(nome_arquivo_livros, livro);
                 break;
             }
-            case 'U': { // Usuário
+            case 'U': {
+                // A função processarLinhaUsuario já usa uma cópia local, então está segura.
                 processarLinhaUsuario(nome_arquivo_usuarios, conteudo_linha);
                 break;
             }
-            case 'E': { // Empréstimo
+            case 'E': {
+                 // A função processarLinhaEmprestimo já usa uma cópia local, então está segura.
                 processarLinhaEmprestimo(nome_arquivo_livros, conteudo_linha);
                 break;
             }
             default:
-                printf("Tipo de registro desconhecido: %c na linha: %s\n", tipo_registro, linha);
+                printf("Tipo de registro desconhecido na linha: %s\n", linha_local);
                 break;
         }
     }
@@ -174,6 +177,8 @@ void carregarDadosCompletos(const char *nome_arquivo_livros, const char *nome_ar
     printf("Dados carregados do arquivo de texto com sucesso.\n");
 }
 
+
+// Funções de utilidade de string (continuam iguais)
 void removerEspacos(char *str) {
     if (str == NULL) return;
     char *i = str;
@@ -186,7 +191,6 @@ void removerEspacos(char *str) {
     }
     *i = 0;
 
-    // Remove trailing spaces
     i = str + strlen(str) - 1;
     while(i >= str && isspace((unsigned char)*i)) {
         i--;
