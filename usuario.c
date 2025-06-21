@@ -135,3 +135,38 @@ char* getNomeUsuarioPorCodigo(const char *nome_arquivo_usuarios, int codigo_usua
     fclose(arquivo);
     return NULL;
 }
+// Função para checar se um usuário existe no arquivo binário
+// pre-condição: o arquivo binário de usuários deve existir
+// pos-condição: retorna 1 se o usuário existe, 0 caso contrário    
+// Entrada: nome do arquivo binário de usuários e código do usuário
+// retorno: 1 se o usuário existe, 0 caso contrário
+
+char* getNomeUsuarioPorCodigo(const char *nome_arquivo_usuarios, int codigo_usuario) {
+    FILE *arquivo = fopen(nome_arquivo_usuarios, "rb");
+    if (!arquivo) {
+        return NULL; // File doesn't exist or error
+    }
+
+    Cabecalho cabecalho;
+    fread(&cabecalho, sizeof(Cabecalho), 1, arquivo);
+
+    int posicao_atual = cabecalho.posicao_inicio_lista;
+    Usuario usuario;
+
+    while (posicao_atual != -1) {
+        fseek(arquivo, posicao_atual, SEEK_SET);
+        fread(&usuario, sizeof(Usuario), 1, arquivo);
+        if (usuario.codigo_usuario == codigo_usuario) {
+            fclose(arquivo);
+            char* nome = malloc(sizeof(char) * MAX_NOME_USUARIO);
+            if (nome) {
+                strcpy(nome, usuario.nome_usuario);
+                return nome;
+            }
+            return NULL; // Malloc failed
+        }
+        posicao_atual = usuario.prox_registro;
+    }
+    fclose(arquivo);
+    return NULL; // User not found
+}

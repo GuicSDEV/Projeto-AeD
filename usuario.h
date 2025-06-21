@@ -16,5 +16,5 @@ typedef struct Usuario {
 // funcoes para manipulação de usuários
 void cadastrarUsuario(const char *nome_arquivo_usuarios, Usuario usuario);
 int buscarUsuarioPorCodigo(const char *nome_arquivo_usuarios, int codigo_usuario);
-
+char* getNomeUsuarioPorCodigo(const char *nome_arquivo_usuarios, int codigo_usuario);
 #endif

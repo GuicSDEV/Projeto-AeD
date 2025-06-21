@@ -123,33 +123,24 @@ void processarLinhaEmprestimo(const char *nome_arquivo_livros, char *linha) {
 
 
     if (strlen(data_devolucao) > 0) {
-        // Registro de devolução
-        // Aqui, vamos chamar a função devolverLivro, que deve atualizar o estoque do livro
-        // e marcar o empréstimo como devolvido.
-        devolverLivro(nome_arquivo_livros, codigo_livro, buscarUsuarioPorCodigo("usuarios.bin", codigo_usuario));
-        // assumindo que devolverLivro atualiza o estoque e marca o empréstimo como devolvido
-        // Se devolverLivro foi bem-sucedido, não precisamos fazer mais nada aqui.
-        printf("Devolução registrada com sucesso para o usuário %d do livro %d.\n", codigo_usuario, codigo_livro);
-    } else {
-        // Registro de empréstimo
-        // Primeiro, vamos verificar se o usuário existe
-        // Se o usuário não existe, não podemos registrar o empréstimo
-        if (!buscarUsuarioPorCodigo("usuarios.bin", codigo_usuario)) {
-            printf("Erro: Usuário com código %d não encontrado.\n", codigo_usuario);
-            return;
+        
+        char *NomeUsuario = getNomeUsuarioPorCodigo("usuarios.bin", codigo_usuario);
+        if (NomeUsuario) {
+            devolverLivro(nome_arquivo_livros, codigo_livro, NomeUsuario);
+            printf("Devolução registrada com sucesso para o usuário %s do livro %d.\n", NomeUsuario, codigo_livro);
+            free(NomeUsuario); 
+        } else {
+            printf("Erro ao carregar devolução: Usuário com código %d não encontrado.\n", codigo_usuario);
         }
-        // Se o usuário existe, vamos registrar o empréstimo
-        // Vamos pegar o nome do usuário para registrar o empréstimo
-        // Aqui, vamos chamar a função emprestarLivro, que deve atualizar o estoque do livro
-        // e registrar o empréstimo no arquivo de empréstimos.
-        // Primeiro, vamos obter o nome do usuário
-        char *userName = getNomeUsuarioPorCodigo("usuarios.bin", codigo_usuario); // Assuming a users.bin file
-        if (userName) {
-            // Agora, vamos registrar o empréstimo
-            // Chama a função emprestarLivro, que deve atualizar o estoque do livro
-            // e registrar o empréstimo no arquivo de empréstimos.  
-            emprestarLivro(nome_arquivo_livros, codigo_livro, userName);
-            free(userName); 
+    } else {
+        // Se não há devolução, vamos registrar o empréstimo
+        
+
+        char *NomeUsuario = getNomeUsuarioPorCodigo("usuarios.bin", codigo_usuario);
+        if (NomeUsuario) {
+            emprestarLivro(nome_arquivo_livros, codigo_livro, NomeUsuario);
+            printf("Empréstimo registrado com sucesso para o usuário %s do livro %d.\n", NomeUsuario, codigo_livro); 
+            free(NomeUsuario); // Free the dynamically allocated memory
         } else {
             printf("Erro ao carregar empréstimo: Usuário com código %d não encontrado.\n", codigo_usuario);
         }
