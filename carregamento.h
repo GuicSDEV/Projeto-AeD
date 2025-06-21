@@ -5,6 +5,8 @@
 #include "livro.h"
 #include "util.h"
 #include "usuario.h"
+#include "arquivo.h"
+
 
 // Carrega dados completos de livros e usuários a partir de arquivos binários
 // e registra empréstimos pendentes em um arquivo de texto

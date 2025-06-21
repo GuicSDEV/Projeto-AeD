@@ -5,7 +5,7 @@
 typedef struct Emprestimo {
     int codigo_livro; 
     char nome_usuario[MAX_NOME_USUARIO];  
-    char data_emprestimo[16]; // Formato: "DD/MM/AAAA"
+    char data_emprestimo[37]; // Formato: "DD/MM/AAAA"
     int devolvido; // 0 = não devolvido, 1 = devolvido 
 } Emprestimo;
 

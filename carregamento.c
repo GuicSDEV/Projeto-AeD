@@ -7,32 +7,32 @@
 #include "util.h"
 #include "usuario.h"
 #include "carregamento.h"
-/// funcao para processar uma linha de texto e cadastrar um usuário
 
+// Função para processar uma linha de texto e cadastrar um usuário
 void processarLinhaUsuario(const char *nome_arquivo_usuarios, char *linha) {
     Usuario usuario;
     char *token;
 
-    // primeiro token: código do usuário
+    // Primeiro token: código do usuário
     token = strtok(linha, ";");
     removerEspacos(token);
     usuario.codigo_usuario = atoi(token);
 
-    // segundo token: nome do usuário
+    // Segundo token: nome do usuário
     token = strtok(NULL, ";");
     removerEspacos(token);
     strcpy(usuario.nome_usuario, token);
 
-    usuario.prox_registro = -1; // no próximo registro
-    // cadastrar o usuário no arquivo binário
+    usuario.prox_registro = -1; // Próximo registro
+    // Cadastrar o usuário no arquivo binário
     if (buscarUsuarioPorCodigo(nome_arquivo_usuarios, usuario.codigo_usuario)) {
         printf("Erro: Usuário com o código %d já existe.\n", usuario.codigo_usuario);
         return;
     }
-    // se o usuário já existe, não o cadastra
+    // Se o usuário já existe, não cadastra novamente
     FILE *arquivo = fopen(nome_arquivo_usuarios, "rb+");
     if (!arquivo) {
-        // se o arquivo não existe, cria um novo
+        // Se o arquivo não existe, cria um novo
         printf("Arquivo binário de usuários não encontrado. Criando um novo arquivo.\n");
         arquivo = fopen(nome_arquivo_usuarios, "wb+");
         if (!arquivo) {
@@ -48,108 +48,69 @@ void processarLinhaUsuario(const char *nome_arquivo_usuarios, char *linha) {
 }
 
 // Função para processar uma linha de texto e registrar um empréstimo ou devolução
-// assumindo que o formato da linha é:
-// "CódUsu;CódLivro;DataEmprestimo;DataDevolucao"
-// onde DataDevolucao é opcional
-// pre-condição: o arquivo de livros deve existir e estar no formato correto
-// pos-condição: o empréstimo ou devolução é registrado no arquivo de empréstimos
-// Entrada: nome do arquivo de livros, e a linha de texto a ser processada
+// Formato da linha: "CódUsu;CódLivro;DataEmprestimo;DataDevolucao"
+// Onde DataDevolucao é opcional
+// Pré-condição: o arquivo de livros deve existir e estar no formato correto
+// Pós-condição: o empréstimo ou devolução é registrado no arquivo de empréstimos
+// Entrada: nome do arquivo de livros e a linha de texto a ser processada
 // Retorno: nenhum
 void processarLinhaEmprestimo(const char *nome_arquivo_livros, char *linha) {
     int codigo_usuario;
     int codigo_livro;
-    char data_emprestimo[11]; // "dd/mm/aaaa"
-    char data_devolucao[11]; // "dd/mm/aaaa" (optional)
+    char data_emprestimo[11];
+    char data_devolucao[11];
 
     char *token;
 
-    // primeiro token: código do usuário
     token = strtok(linha, ";");
     removerEspacos(token);
     codigo_usuario = atoi(token);
 
-    // Segundo token: código do livro
     token = strtok(NULL, ";");
     removerEspacos(token);
     codigo_livro = atoi(token);
 
-    // terceiro token: data de empréstimo
     token = strtok(NULL, ";");
     removerEspacos(token);
     strcpy(data_emprestimo, token);
 
-    // quarto token: data de devolução 
     token = strtok(NULL, ";");
     if (token) {
         removerEspacos(token);
         strcpy(data_devolucao, token);
     } else {
-        strcpy(data_devolucao, ""); // nao há devolução
+        strcpy(data_devolucao, "");
     }
 
-    // agora vamos registrar o empréstimo ou devolução
     // Primeiro, verificar se o livro existe e se há estoque suficiente
     if (!buscarLivroPorCodigo(nome_arquivo_livros, codigo_livro)) {
         printf("Erro: Livro com código %d não encontrado.\n", codigo_livro);
         return;
     }
-    // Se o livro existe, vamos verificar se há estoque
-    Livro livro;
-    FILE *arquivo_livros = fopen(nome_arquivo_livros, "rb+");
-    if (!arquivo_livros) {
-        perror("Erro ao abrir o arquivo de livros");
+
+    // Tenta obter o nome do usuário para usar nas funções de empréstimo/devolução
+    char *userName = getNomeUsuarioPorCodigo("usuarios.bin", codigo_usuario);
+    if (userName == NULL) {
+        printf("Erro: Usuário com código %d não encontrado para registrar empréstimo/devolução.\n", codigo_usuario);
         return;
     }
-    Cabecalho cabecalho;
-    fread(&cabecalho, sizeof(Cabecalho), 1, arquivo_livros);
-    int posicao_atual = cabecalho.posicao_inicio_lista;
-    while (posicao_atual != -1) {
-        fseek(arquivo_livros, posicao_atual, SEEK_SET);
-        fread(&livro, sizeof(Livro), 1, arquivo_livros);
-        if (livro.codigo == codigo_livro) {
-            if (livro.quantidade_estoque <= 0 && strlen(data_devolucao) == 0) {
-                printf("Erro: Livro com código %d não está disponível para empréstimo.\n", codigo_livro);
-                fclose(arquivo_livros);
-                return;
-            }
-            break; // Livro encontrado
-        }
-        posicao_atual = livro.prox_registro;
-    }
-    fclose(arquivo_livros);
-    // Agora, se o livro está disponível, vamos registrar o empréstimo ou devolução
-    // Se há devolução, vamos registrar a devolução
-    // Se não há devolução, vamos registrar o empréstimo
-
 
     if (strlen(data_devolucao) > 0) {
-        
-        char *NomeUsuario = getNomeUsuarioPorCodigo("usuarios.bin", codigo_usuario);
-        if (NomeUsuario) {
-            devolverLivro(nome_arquivo_livros, codigo_livro, NomeUsuario);
-            printf("Devolução registrada com sucesso para o usuário %s do livro %d.\n", NomeUsuario, codigo_livro);
-            free(NomeUsuario); 
-        } else {
-            printf("Erro ao carregar devolução: Usuário com código %d não encontrado.\n", codigo_usuario);
-        }
+        // Registro de devolução
+        devolverLivro(nome_arquivo_livros, codigo_livro, userName); 
+        printf("Devolução registrada com sucesso para o usuário %s do livro %d.\n", userName, codigo_livro);
     } else {
-        // Se não há devolução, vamos registrar o empréstimo
-        
-
-        char *NomeUsuario = getNomeUsuarioPorCodigo("usuarios.bin", codigo_usuario);
-        if (NomeUsuario) {
-            emprestarLivro(nome_arquivo_livros, codigo_livro, NomeUsuario);
-            printf("Empréstimo registrado com sucesso para o usuário %s do livro %d.\n", NomeUsuario, codigo_livro); 
-            free(NomeUsuario); // Free the dynamically allocated memory
-        } else {
-            printf("Erro ao carregar empréstimo: Usuário com código %d não encontrado.\n", codigo_usuario);
-        }
+        // Registro de empréstimo
+        // A verificação de estoque já deve acontecer dentro de emprestarLivro
+        emprestarLivro(nome_arquivo_livros, codigo_livro, userName); 
+        printf("Empréstimo registrado com sucesso para o usuário %s do livro %d.\n", userName, codigo_livro);
     }
-}
 
+    free(userName); // Libera a memória alocada por getNomeUsuarioPorCodigo
+}
 // Função para carregar dados completos de livros e usuários a partir de um arquivo de texto
-// pre-condição: o arquivo de texto deve existir e estar no formato correto
-// pos-condição: os dados de livros e usuários são carregados, e empréstimos pendentes são registrados
+// Pré-condição: o arquivo de texto deve existir e estar no formato correto
+// Pós-condição: os dados de livros e usuários são carregados, e empréstimos pendentes são registrados
 // Entrada: nomes dos arquivos binários de livros e usuários, e nome do arquivo de texto para empréstimos
 // Retorno: nenhum
 void carregarDadosCompletos(const char *nome_arquivo_livros, const char *nome_arquivo_usuarios, const char *arquivo_txt) {
@@ -161,12 +122,12 @@ void carregarDadosCompletos(const char *nome_arquivo_livros, const char *nome_ar
 
     char linha[512];
     while (fgets(linha, sizeof(linha), arquivo_texto)) {
-        linha[strcspn(linha, "\n")] = '\0'; // Remove newline
+        linha[strcspn(linha, "\n")] = '\0'; // Remove o caractere de nova linha
 
-        char tipo_registro = linha[0]; // First character indicates type
-        char *conteudo_linha = &linha[2]; // Skip type char and semicolon (e.g., "L;")
+        char tipo_registro = linha[0]; // Primeiro caractere indica o tipo
+        char *conteudo_linha = &linha[2]; // Pula o tipo e o ponto e vírgula (ex: "L;")
 
-        removerEspacos(conteudo_linha); // Clean up leading/trailing spaces
+        removerEspacos(conteudo_linha); // Remove espaços em branco do início/fim
 
         switch (tipo_registro) {
             case 'L': { // Livro
@@ -177,7 +138,6 @@ void carregarDadosCompletos(const char *nome_arquivo_livros, const char *nome_ar
                 removerEspacos(token);
                 livro.codigo = atoi(token);
 
-                // ... (rest of book parsing, similar to original carregarArquivoDados) ...
                 token = strtok(NULL, ";");
                 removerEspacos(token);
                 strcpy(livro.titulo, token);
@@ -216,7 +176,7 @@ void carregarDadosCompletos(const char *nome_arquivo_livros, const char *nome_ar
                 break;
             }
             case 'E': { // Empréstimo
-                processarLinhaEmprestimo(nome_arquivo_livros, conteudo_linha); // Pass book file for stock update
+                processarLinhaEmprestimo(nome_arquivo_livros, conteudo_linha); // Passa o arquivo de livros para atualizar o estoque
                 break;
             }
             default:
@@ -227,6 +187,7 @@ void carregarDadosCompletos(const char *nome_arquivo_livros, const char *nome_ar
     fclose(arquivo_texto);
     printf("Dados carregados do arquivo de texto com sucesso.\n");
 }
+
 // Função para remover espaços de uma string
 void removerEspacos(char *str) {
     char *dest = str;
@@ -236,8 +197,9 @@ void removerEspacos(char *str) {
         }
         str++;
     }
-    *dest = '\0'; // Termina a string resultante
+    *dest = '\0'; // Finaliza a string resultante
 }
+
 // Função para substituir vírgulas por pontos em uma string
 void substituirVirgulaPorPonto(char *str) {
     while (*str) {
