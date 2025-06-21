@@ -1,4 +1,4 @@
-# Sistema de Gerenciamento de Livraria
+# 📚🧑🏻‍🏫 Sistema de Gerenciamento de Livraria
 
 Este é um sistema em C para gerenciar livros, usuários e empréstimos em uma livraria. Ele permite o cadastro, remoção, busca e listagem de livros, bem como o registro e devolução de empréstimos e o cadastro de usuários. Os dados são persistidos em arquivos binários.
 
